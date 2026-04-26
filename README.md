@@ -1,4 +1,4 @@
-# ClaudesUsage
+# MeltingClaude
 
 A lightweight macOS menu bar app that tracks your **Claude Code** rate-limit status in real time, so you stop getting cut off mid-task.
 
@@ -8,7 +8,7 @@ A lightweight macOS menu bar app that tracks your **Claude Code** rate-limit sta
 
 ## Why
 
-Claude Code subscribers (Pro / Max) hit the 5-hour rolling rate limit constantly. The Anthropic Console shows usage *after the fact* — ClaudesUsage shows it **now**, in your menu bar, while you work.
+Claude Code subscribers (Pro / Max) hit the 5-hour rolling rate limit constantly. The Anthropic Console shows usage *after the fact* — MeltingClaude shows it **now**, in your menu bar, while you work.
 
 ## What it shows
 
@@ -38,8 +38,8 @@ Zero network. Zero accounts. Your usage data lives in a local SQLite database on
 ## Build from source
 
 ```bash
-git clone git@github.com:SSub-jun/ClaudesUsage.git
-cd ClaudesUsage
+git clone git@github.com:SSub-jun/MeltingClaude.git
+cd MeltingClaude
 open ClaudeUsage.xcodeproj
 ```
 

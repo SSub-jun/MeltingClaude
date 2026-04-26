@@ -1,4 +1,4 @@
-# ClaudesUsage — App Store Connect 등록 자료
+# MeltingClaude — App Store Connect 등록 자료
 
 App Store Connect 각 필드에 그대로 붙여넣을 수 있게 정리. URL 3개와 스크린샷만 직접 만들면 됨.
 
@@ -8,9 +8,9 @@ App Store Connect 각 필드에 그대로 붙여넣을 수 있게 정리. URL 3�
 
 | 필드 | 값 |
 |---|---|
-| **Name** | `ClaudesUsage` |
+| **Name** | `MeltingClaude` |
 | **Subtitle** (30자) | `Claude Code rate-limit watch` |
-| **Bundle ID** | `com.byeonjunseob.ClaudesUsage` (예시 — 본인 도메인으로) |
+| **Bundle ID** | `com.byeonjunseob.MeltingClaude` (예시 — 본인 도메인으로) |
 | **Primary Category** | Developer Tools |
 | **Secondary Category** | Productivity |
 | **Age Rating** | 4+ |
@@ -36,10 +36,10 @@ Track your Claude Code usage live from the menu bar. See how close you are to th
 ## 4. Description (4000자)
 
 ```
-ClaudesUsage is a lightweight macOS menu bar app that shows your Claude Code rate-limit status in real time, so you stop getting cut off mid-task.
+MeltingClaude is a lightweight macOS menu bar app that shows your Claude Code rate-limit status in real time, so you stop getting cut off mid-task.
 
 WHY IT EXISTS
-Claude Code subscribers (Pro / Max) hit the 5-hour rolling rate limit constantly. The Anthropic Console shows usage after the fact — ClaudesUsage shows it now, in your menu bar, while you work.
+Claude Code subscribers (Pro / Max) hit the 5-hour rolling rate limit constantly. The Anthropic Console shows usage after the fact — MeltingClaude shows it now, in your menu bar, while you work.
 
 WHAT IT DOES
 • Reads your local Claude Code session logs (~/.claude/projects/) every few seconds
@@ -93,11 +93,11 @@ claude,claudecode,anthropic,ai,llm,usage,ratelimit,menubar,developer,productivit
 ## 7. Privacy Policy (그대로 호스팅)
 
 ```markdown
-# Privacy Policy — ClaudesUsage
+# Privacy Policy — MeltingClaude
 
 Last updated: 2026-04-26
 
-ClaudesUsage is a macOS menu-bar app that visualizes your local Claude Code usage. This document explains exactly what the app does and does not do with your data.
+MeltingClaude is a macOS menu-bar app that visualizes your local Claude Code usage. This document explains exactly what the app does and does not do with your data.
 
 ## Data we collect
 
@@ -147,7 +147,7 @@ For questions or issues: <YOUR_SUPPORT_URL>
 ### Notes for Reviewer (그대로)
 
 ```
-ClaudesUsage reads JSONL session log files that Claude Code (an AI coding tool by
+MeltingClaude reads JSONL session log files that Claude Code (an AI coding tool by
 Anthropic, https://claude.com/code) writes locally to ~/.claude/projects/.
 It aggregates token counts for visualization in a menu-bar UI.
 
@@ -163,7 +163,7 @@ To test:
 1. Install Claude Code from https://claude.com/code and run it once to create
    a sample session at ~/.claude/projects/. (Or copy any sample .jsonl file into
    ~/.claude/projects/test/.)
-2. Launch ClaudesUsage. Onboarding will detect Claude Code and prompt for the
+2. Launch MeltingClaude. Onboarding will detect Claude Code and prompt for the
    ~/.claude/ folder.
 3. Click "Connect Claude Code" — the menu bar icon updates within seconds.
 
