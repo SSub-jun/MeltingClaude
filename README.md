@@ -40,7 +40,7 @@ Zero network. Zero accounts. Your usage data lives in a local SQLite database on
 ```bash
 git clone git@github.com:SSub-jun/MeltingClaude.git
 cd MeltingClaude
-open ClaudeUsage.xcodeproj
+open MeltingClaude.xcodeproj
 ```
 
 Requires Xcode 16+, macOS 14+ deployment target.

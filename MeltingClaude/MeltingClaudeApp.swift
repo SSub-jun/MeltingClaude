@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 @main
-struct ClaudeUsageApp: App {
+struct MeltingClaudeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var vm = UsageViewModel()
     @StateObject private var settings = AppSettings.shared
@@ -45,7 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         let hosting = NSHostingController(rootView: view)
         let window = NSWindow(contentViewController: hosting)
-        window.title = "Welcome to Claude Usage"
+        window.title = "Welcome to MeltingClaude"
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
         window.center()

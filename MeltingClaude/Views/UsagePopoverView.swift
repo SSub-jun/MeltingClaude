@@ -9,7 +9,7 @@ struct UsagePopoverView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Claude Usage")
+            Text("MeltingClaude")
                 .font(.headline)
 
             Divider()

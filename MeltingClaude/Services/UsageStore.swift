@@ -8,12 +8,12 @@ final class UsageStore {
 
     private var db: OpaquePointer?
     private let dbURL: URL
-    private let queue = DispatchQueue(label: "ClaudeUsage.UsageStore")
+    private let queue = DispatchQueue(label: "MeltingClaude.UsageStore")
 
     static var dataFolder: URL {
         let base = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return base.appendingPathComponent("Claude Usage", isDirectory: true)
+        return base.appendingPathComponent("MeltingClaude", isDirectory: true)
     }
 
     private init() {
@@ -63,7 +63,7 @@ final class UsageStore {
         insertIfNew(r, externalId: nil)
     }
 
-    /// external_id 가 이미 있으면 무시. mock 데이터는 externalId=nil 로 호출되어 항상 INSERT 됨.
+    /// external_id 가 이미 있으면 무시.
     func insertIfNew(_ r: UsageRecord, externalId: String?) {
         queue.sync {
             let sql = """

@@ -12,7 +12,7 @@ struct OnboardingView: View {
     var body: some View {
         VStack(spacing: 18) {
             VStack(spacing: 6) {
-                Text("Welcome to Claude Usage")
+                Text("Welcome to MeltingClaude")
                     .font(.title2.bold())
                 Text("See how close you are to your Claude Code rate limit, before it cuts you off.\nReads your local session logs — no servers, no API keys.")
                     .font(.callout)

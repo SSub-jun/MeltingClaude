@@ -12,7 +12,7 @@ final class ClaudeLogIngestor {
     private let store: UsageStore
     private let projectsDir: URL
     private let offsetsKey = "claudeLogIngestor.fileOffsets"
-    private let queue = DispatchQueue(label: "ClaudeUsage.LogIngestor")
+    private let queue = DispatchQueue(label: "MeltingClaude.LogIngestor")
     private var timer: Timer?
     private var fileOffsets: [String: UInt64]
     private let iso = ISO8601DateFormatter()
