@@ -18,12 +18,16 @@ final class UsageViewModel: ObservableObject {
     @Published var dailyTotals: [DailyTotal] = []
     @Published var recent: [UsageRecord] = []
     @Published var lastUpdated: Date = Date()
+    @Published var menuBarAssetName: String = UsageTier.over.assetName
 
     private let store: UsageStore
     private let service: UsageSummaryService
     private let settings: AppSettings
     private var timer: Timer?
     private var settingsCancellable: AnyCancellable?
+    private var animationTimer: Timer?
+    private var animatingTier: UsageTier?
+    private var animationFrame: Int = 0
 
     init(store: UsageStore = .shared, settings: AppSettings = .shared) {
         self.store = store
@@ -37,7 +41,10 @@ final class UsageViewModel: ObservableObject {
             .sink { [weak self] _ in self?.applyAutoRefresh() }
     }
 
-    deinit { timer?.invalidate() }
+    deinit {
+        timer?.invalidate()
+        animationTimer?.invalidate()
+    }
 
     // MARK: - Derived
 
@@ -45,12 +52,6 @@ final class UsageViewModel: ObservableObject {
 
     var menuBarTier: UsageTier {
         UsageTier.from(tokens: menuBarTokens, settings: settings)
-    }
-
-    var menuBarAssetName: String {
-        let preferred = menuBarTier.assetName
-        if NSImage(named: preferred) != nil { return preferred }
-        return UsageTier.over.assetName
     }
 
     // MARK: - Refresh
@@ -62,6 +63,63 @@ final class UsageViewModel: ObservableObject {
         dailyTotals = computeDailyTotals()
         recent = service.recent(limit: 5)
         lastUpdated = Date()
+        updateMenuBarAnimation()
+    }
+
+    // MARK: - Menu bar animation
+    // Tier 별 프레임 수/주기. 프레임 자산(menubar-{tier}-{n}) 없으면 단일 자산으로 폴백 →
+    // 같은 값이 반복 set 되면 SwiftUI 재렌더 스킵돼서 사실상 no-op.
+
+    private func updateMenuBarAnimation() {
+        let tier = menuBarTier
+        guard tier != animatingTier else { return }
+        animatingTier = tier
+        animationFrame = 0
+
+        animationTimer?.invalidate()
+        let interval = animationInterval(for: tier)
+        let timer = Timer(timeInterval: interval, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.advanceMenuBarFrame() }
+        }
+        animationTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+
+        applyAssetName(resolveAssetName(tier: tier, frame: 0))
+    }
+
+    private func advanceMenuBarFrame() {
+        guard let tier = animatingTier else { return }
+        animationFrame = (animationFrame + 1) % frameCount(for: tier)
+        applyAssetName(resolveAssetName(tier: tier, frame: animationFrame))
+    }
+
+    private func applyAssetName(_ name: String) {
+        if name != menuBarAssetName { menuBarAssetName = name }
+    }
+
+    private func resolveAssetName(tier: UsageTier, frame: Int) -> String {
+        let frameName = "\(tier.assetName)-\(frame)"
+        if NSImage(named: frameName) != nil { return frameName }
+        if NSImage(named: tier.assetName) != nil { return tier.assetName }
+        return UsageTier.over.assetName
+    }
+
+    private func frameCount(for tier: UsageTier) -> Int {
+        switch tier {
+        case .low:  return 2
+        case .mid:  return 3
+        case .high: return 4
+        case .over: return 5
+        }
+    }
+
+    private func animationInterval(for tier: UsageTier) -> TimeInterval {
+        switch tier {
+        case .low:  return 0.8
+        case .mid:  return 0.5
+        case .high: return 0.4
+        case .over: return 0.3
+        }
     }
 
     private func applyAutoRefresh() {
