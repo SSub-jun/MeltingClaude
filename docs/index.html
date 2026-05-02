@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeltingClaude — See your Claude Code rate limit melt away</title>
+<meta name="description" content="A lightweight macOS menu bar app that shows your Claude Code rate-limit status in real time. 100% local — no servers, no API keys.">
+<meta property="og:title" content="MeltingClaude">
+<meta property="og:description" content="See your Claude Code rate limit melt away — live, in your menu bar.">
+<meta property="og:image" content="icon.png">
+<style>
+  :root {
+    --bg-base: #0a0a0a;
+    --text: #f5f5f5;
+    --text-dim: #a0a0a0;
+    --accent: #007aff;
+    --card-bg: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background:
+      radial-gradient(circle at 20% 0%, #2a1f4f 0%, transparent 45%),
+      radial-gradient(circle at 80% 30%, #1f2f4f 0%, transparent 50%),
+      linear-gradient(180deg, #0c0c14 0%, #0a0a0a 100%);
+    background-attachment: fixed;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,10,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  nav .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text);
+  }
+  nav .logo img { width: 28px; height: 28px; }
+  nav .links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; }
+  nav .links a { color: var(--text-dim); }
+  nav .links a:hover { color: var(--text); text-decoration: none; }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 80px 0 60px;
+    text-align: center;
+  }
+  .hero img.icon {
+    width: 180px; height: 180px;
+    filter: drop-shadow(0 12px 40px rgba(220,38,38,0.35));
+    margin-bottom: 32px;
+  }
+  .hero h1 {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+    background: linear-gradient(135deg, #fff 0%, #b0b0c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+  .hero .tagline {
+    font-size: 22px;
+    color: var(--text-dim);
+    margin: 0 0 40px;
+    font-weight: 400;
+  }
+  .cta-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .cta:hover { background: #1a8aff; text-decoration: none; }
+  .cta.secondary {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--card-border);
+  }
+  .cta.secondary:hover { background: rgba(255,255,255,0.12); }
+  .cta .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Demo strip */
+  .demo {
+    padding: 60px 0;
+  }
+  .demo h2 {
+    text-align: center;
+    font-size: 32px;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+  .demo p.sub {
+    text-align: center;
+    color: var(--text-dim);
+    margin: 0 0 48px;
+    font-size: 16px;
+  }
+  .tier-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .tier-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px 16px;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .tier-card .icon-big {
+    width: 130px; height: 130px;
+    margin: 0 auto 18px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  }
+  .pill {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .pill.low  { background: #16a34a; color: #fff; }
+  .pill.mid  { background: #eab308; color: #1a1a00; }
+  .pill.high { background: #f97316; color: #fff; }
+  .pill.over { background: #dc2626; color: #fff; }
+  .tier-card .range { font-size: 12px; color: var(--text-dim); }
+
+  /* Features */
+  .features {
+    padding: 60px 0;
+  }
+  .features h2 {
+    text-align: center; font-size: 32px; margin: 0 0 48px;
+    letter-spacing: -0.02em;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .feature {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .feature h3 { margin: 0 0 10px; font-size: 18px; font-weight: 600; }
+  .feature p { margin: 0; color: var(--text-dim); font-size: 15px; }
+  .feature .emoji { font-size: 28px; margin-bottom: 12px; }
+
+  /* Privacy callout */
+  .privacy-block {
+    margin: 60px 0;
+    padding: 40px;
+    background: rgba(22,163,74,0.08);
+    border: 1px solid rgba(22,163,74,0.25);
+    border-radius: 16px;
+    text-align: center;
+  }
+  .privacy-block h2 { margin: 0 0 12px; font-size: 26px; color: #4ade80; }
+  .privacy-block p { margin: 0; color: var(--text-dim); }
+
+  /* Footer */
+  footer {
+    padding: 60px 0 40px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    border-top: 1px solid var(--card-border);
+    margin-top: 60px;
+  }
+  footer .links { margin: 12px 0; display: flex; justify-content: center; gap: 24px; }
+  footer .small { font-size: 12px; opacity: 0.7; margin-top: 16px; }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 36px; }
+    .hero .tagline { font-size: 17px; }
+    .tier-row { grid-template-columns: repeat(2, 1fr); }
+    .feature-grid { grid-template-columns: 1fr; }
+    nav .links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">
+    <img src="icon.png" alt="">
+    <span>MeltingClaude</span>
+  </a>
+  <div class="links">
+    <a href="#features">Features</a>
+    <a href="SUPPORT.html">Support</a>
+    <a href="PRIVACY.html">Privacy</a>
+    <a href="https://github.com/SSub-jun/MeltingClaude">GitHub</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <section class="hero">
+    <img class="icon" src="icon.png" alt="MeltingClaude app icon">
+    <h1>See your Claude Code rate limit melt away</h1>
+    <p class="tagline">A lightweight macOS menu bar app that shows your usage live — before it cuts you off.</p>
+    <div class="cta-row">
+      <a class="cta" href="#"><span>Get on the Mac App Store</span><span class="badge">Soon</span></a>
+      <a class="cta secondary" href="https://github.com/SSub-jun/MeltingClaude">View on GitHub</a>
+    </div>
+  </section>
+
+  <section class="demo">
+    <h2>Four tiers, animated in real time</h2>
+    <p class="sub">As you climb toward the 5-hour rate limit, the character progressively melts.</p>
+    <div class="tier-row">
+      <div class="tier-card">
+        <img class="icon-big" id="t-low"  src="frames/low-0.png" alt="">
+        <div class="pill low">OK</div>
+        <div class="range">0 – 50K tokens</div>
+      </div>
+      <div class="tier-card">
+        <img class="icon-big" id="t-mid"  src="frames/mid-0.png" alt="">
+        <div class="pill mid">Active</div>
+        <div class="range">50K – 150K tokens</div>
+      </div>
+      <div class="tier-card">
+        <img class="icon-big" id="t-high" src="frames/high-0.png" alt="">
+        <div class="pill high">Heavy</div>
+        <div class="range">150K – 300K tokens</div>
+      </div>
+      <div class="tier-card">
+        <img class="icon-big" id="t-over" src="frames/over-0.png" alt="">
+        <div class="pill over">At limit</div>
+        <div class="range">300K+ tokens</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <h2>What you get</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="emoji">📊</div>
+        <h3>Live tier indicator</h3>
+        <p>An animated icon in your menu bar transitions through 4 stages as your usage climbs toward the 5-hour rate limit.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">📅</div>
+        <h3>7-day chart + today summary</h3>
+        <p>Click the icon to see your current 5-hour block, today's totals, recent messages, and a 7-day usage chart.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">🎚️</div>
+        <h3>Plan-aware thresholds</h3>
+        <p>Pick Pro, Max 5×, Max 20×, or Custom — the app adjusts color tiers to your subscription's typical caps.</p>
+      </div>
+      <div class="feature">
+        <div class="emoji">🔒</div>
+        <h3>100% local</h3>
+        <p>Reads your local Claude Code session logs only. No servers, no API keys, no telemetry. The app makes zero network requests.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="privacy-block">
+    <h2>Privacy by design</h2>
+    <p>MeltingClaude makes <strong>zero network requests</strong>. Your usage data never leaves your Mac. <a href="PRIVACY.html">Read the privacy policy →</a></p>
+  </section>
+
+</div>
+
+<footer>
+  <div>© 2026 MeltingClaude. Independent third-party tool — not affiliated with Anthropic.</div>
+  <div class="links">
+    <a href="SUPPORT.html">Support</a>
+    <a href="PRIVACY.html">Privacy</a>
+    <a href="https://github.com/SSub-jun/MeltingClaude">GitHub</a>
+    <a href="https://github.com/SSub-jun/MeltingClaude/issues">Report an issue</a>
+  </div>
+  <div class="small">macOS 14 (Sonoma) or later · "Claude" and "Claude Code" are products of Anthropic, PBC.</div>
+</footer>
+
+<script>
+const TIERS = [
+  { key: 'low',  frames: ['low-0.png','low-1.png'],                                interval: 800 },
+  { key: 'mid',  frames: ['mid-0.png','mid-1.png','mid-2.png','mid-3.png'],        interval: 500 },
+  { key: 'high', frames: ['high-0.png','high-1.png','high-2.png','high-3.png'],    interval: 400 },
+  { key: 'over', frames: ['over-0.png','over-1.png','over-2.png','over-3.png'],    interval: 300 },
+];
+TIERS.forEach(t => {
+  let i = 0;
+  const img = document.getElementById('t-' + t.key);
+  setInterval(() => { img.src = 'frames/' + t.frames[i]; i = (i+1) % t.frames.length; }, t.interval);
+});
+</script>
+
+</body>
+</html>

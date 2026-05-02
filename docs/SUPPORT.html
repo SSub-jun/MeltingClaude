@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support — MeltingClaude</title>
+<meta name="description" content="Help, FAQ, and troubleshooting for MeltingClaude — the macOS Claude Code rate-limit menu bar app.">
+<style>
+  :root {
+    --text: #f5f5f5;
+    --text-dim: #a0a0a0;
+    --accent: #007aff;
+    --card-bg: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background:
+      radial-gradient(circle at 20% 0%, #2a1f4f 0%, transparent 45%),
+      radial-gradient(circle at 80% 30%, #1f2f4f 0%, transparent 50%),
+      linear-gradient(180deg, #0c0c14 0%, #0a0a0a 100%);
+    background-attachment: fixed;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,10,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  nav .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; color: var(--text); }
+  nav .logo img { width: 28px; height: 28px; }
+  nav .links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; }
+  nav .links a { color: var(--text-dim); }
+  nav .links a:hover { color: var(--text); text-decoration: none; }
+
+  .container { max-width: 760px; margin: 0 auto; padding: 60px 32px 80px; }
+
+  h1 { font-size: 40px; letter-spacing: -0.02em; margin: 0 0 12px; }
+  .lead { font-size: 18px; color: var(--text-dim); margin: 0 0 48px; }
+  h2 { font-size: 24px; letter-spacing: -0.015em; margin: 56px 0 20px; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 8px; }
+  p { margin: 0 0 12px; color: #d5d5d5; }
+  code { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'SF Mono', Menlo, monospace; }
+  pre { background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 8px; padding: 14px 16px; font-size: 13px; overflow-x: auto; }
+  ul { margin: 0 0 16px; padding-left: 20px; color: #d5d5d5; }
+  li { margin-bottom: 6px; }
+
+  .step {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .step .num {
+    display: inline-flex;
+    width: 24px; height: 24px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  .step h3 { display: inline; margin: 0; font-size: 16px; }
+
+  details {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  details[open] { background: rgba(255,255,255,0.06); }
+  summary {
+    font-weight: 600;
+    font-size: 15px;
+    list-style: none;
+    cursor: pointer;
+    color: var(--text);
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '▸ '; color: var(--text-dim); margin-right: 4px; }
+  details[open] summary::before { content: '▾ '; }
+  details > *:not(summary) { margin-top: 12px; }
+
+  .contact-card {
+    background: rgba(0,122,255,0.08);
+    border: 1px solid rgba(0,122,255,0.25);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+  }
+  .contact-card a { color: #66b3ff; }
+
+  footer { padding: 60px 0 40px; text-align: center; color: var(--text-dim); font-size: 14px; border-top: 1px solid var(--card-border); margin-top: 60px; }
+  footer .links { margin: 12px 0; display: flex; justify-content: center; gap: 24px; }
+  footer .small { font-size: 12px; opacity: 0.7; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">
+    <img src="icon.png" alt="">
+    <span>MeltingClaude</span>
+  </a>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="PRIVACY.html">Privacy</a>
+    <a href="https://github.com/SSub-jun/MeltingClaude">GitHub</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <h1>Support</h1>
+  <p class="lead">Help, FAQ, and troubleshooting for MeltingClaude.</p>
+
+  <h2>Quick start</h2>
+  <div class="step"><span class="num">1</span><h3>Install MeltingClaude from the Mac App Store and launch it.</h3></div>
+  <div class="step"><span class="num">2</span><h3>On first launch, click <em>Choose ~/.claude/ Folder</em>. macOS will prompt you to confirm read access — this is required because we need to parse your local Claude Code session logs.</h3></div>
+  <div class="step"><span class="num">3</span><h3>Pick your subscription plan (Pro / Max 5× / Max 20×) or switch to <em>Custom</em> in Settings to set your own thresholds. Click <em>Connect Claude Code</em> — the menu bar icon updates within seconds.</h3></div>
+
+  <h2>Frequently asked questions</h2>
+
+  <details>
+    <summary>Why does MeltingClaude need access to my <code>~/.claude/</code> folder?</summary>
+    <p>Claude Code stores session logs at <code>~/.claude/projects/&lt;hash&gt;/&lt;session-id&gt;.jsonl</code>. MeltingClaude reads only those JSONL files to extract token-usage fields (<code>input_tokens</code>, <code>output_tokens</code>, <code>cache_creation_input_tokens</code>, <code>cache_read_input_tokens</code>) plus model name and timestamp.</p>
+    <p>The app is sandboxed — it can only access the folder you explicitly grant via the macOS folder picker. Nothing else on your Mac is touched.</p>
+  </details>
+
+  <details>
+    <summary>Does MeltingClaude send my data anywhere?</summary>
+    <p><strong>No.</strong> The app makes zero network requests — no analytics, no telemetry, no crash reporters, no update checkers. You can verify with Network Link Conditioner or by inspecting it with <code>nettop</code>.</p>
+    <p>All your usage data is stored locally in a SQLite database inside the app's sandbox container. Uninstalling the app removes it.</p>
+  </details>
+
+  <details>
+    <summary>The thresholds aren't accurate for my plan. Can I customize them?</summary>
+    <p>Yes. Open Settings (Cmd+, or via the Settings button in the popover) and choose <strong>Custom</strong> from the plan dropdown. Three text fields appear — set Low / Mid / High caps in tokens. Defaults are seeded from Pro plan estimates.</p>
+    <p>Anthropic doesn't publish the exact 5-hour rate limits, so the built-in Pro / Max 5× / Max 20× thresholds are best-effort estimates based on community observation.</p>
+  </details>
+
+  <details>
+    <summary>I use Claude Code on multiple Macs with the same account. Why doesn't it sync?</summary>
+    <p>MeltingClaude reads only the local <code>~/.claude/</code> folder on each Mac. There's no built-in account-wide sync.</p>
+    <p>This means each Mac shows only its own activity. If you use Mac A heavily and switch to Mac B, MeltingClaude on Mac B won't know about Mac A's usage — even though Anthropic's actual rate limit applies account-wide.</p>
+    <p>Multi-device sync via CloudKit is being explored for a future release.</p>
+  </details>
+
+  <details>
+    <summary>The icon isn't updating. What's wrong?</summary>
+    <p>Most common causes:</p>
+    <ul>
+      <li><strong>Folder not granted</strong>: Open the popover. If you see "Reconnect Claude Code" or no data, your folder permission may have been revoked. Use Settings → re-grant access.</li>
+      <li><strong>Claude Code never run</strong>: The app needs at least one session in <code>~/.claude/projects/</code> to show data. Run Claude Code at least once.</li>
+      <li><strong>Refresh interval too long</strong>: Default is 5 seconds. Change in Settings if needed.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>How do I uninstall?</summary>
+    <p>Drag MeltingClaude.app to Trash. The sandbox container at <code>~/Library/Containers/com.byeonjunseob.MeltingClaude/</code> can be deleted manually if you want to remove all data.</p>
+  </details>
+
+  <details>
+    <summary>Does it work with Claude Code in IDE extensions (VS Code, Cursor, JetBrains)?</summary>
+    <p>Yes. Any Claude Code session — CLI or IDE — writes to <code>~/.claude/projects/</code>, and MeltingClaude reads them all.</p>
+  </details>
+
+  <details>
+    <summary>Does it track Claude.ai chat or the Claude desktop app?</summary>
+    <p>No. Those are separate products from Anthropic and don't write local session logs. MeltingClaude only sees Claude Code (the AI coding tool).</p>
+  </details>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>"Selected folder doesn't contain a 'projects' subfolder"</h3>
+  <p>You picked the wrong folder. The folder must be your <code>~/.claude/</code> directory, which contains a <code>projects/</code> subfolder created by Claude Code. If <code>~/.claude/projects/</code> doesn't exist, run Claude Code at least once first.</p>
+
+  <h3>Token count seems too high or too low</h3>
+  <p>MeltingClaude counts <code>input + cache_creation + output</code> tokens — matching what counts toward your 5-hour rate limit. Cache reads are not counted (Anthropic policy). If your numbers seem off compared to the Anthropic Console, note that the Console may include different time windows or cache-read tokens.</p>
+
+  <h3>App icon shows in menu bar but no data appears in popover</h3>
+  <p>This usually means the folder access was granted but no session files were found yet. Either:</p>
+  <ul>
+    <li>You haven't used Claude Code since granting access — try a session.</li>
+    <li>Bookmark went stale (rare; happens after major macOS updates) — re-grant in Settings.</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <div class="contact-card">
+    <p><strong>Found a bug?</strong> Have a feature request? Want to discuss multi-device sync?</p>
+    <p>Open an issue on GitHub: <a href="https://github.com/SSub-jun/MeltingClaude/issues">github.com/SSub-jun/MeltingClaude/issues</a></p>
+    <p>Please include: macOS version, Claude Code version (if known), and a clear description of what you observed vs. expected.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div>© 2026 MeltingClaude. Independent third-party tool — not affiliated with Anthropic.</div>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="PRIVACY.html">Privacy</a>
+    <a href="https://github.com/SSub-jun/MeltingClaude">GitHub</a>
+  </div>
+  <div class="small">"Claude" and "Claude Code" are products of Anthropic, PBC.</div>
+</footer>
+
+</body>
+</html>

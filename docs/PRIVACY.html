@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — MeltingClaude</title>
+<meta name="description" content="MeltingClaude makes zero network requests. Your usage data never leaves your Mac.">
+<style>
+  :root { --text: #f5f5f5; --text-dim: #a0a0a0; --accent: #007aff; --card-bg: rgba(255,255,255,0.04); --card-border: rgba(255,255,255,0.08); }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background:
+      radial-gradient(circle at 20% 0%, #2a1f4f 0%, transparent 45%),
+      radial-gradient(circle at 80% 30%, #1f2f4f 0%, transparent 50%),
+      linear-gradient(180deg, #0c0c14 0%, #0a0a0a 100%);
+    background-attachment: fixed;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,10,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 14px 32px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  nav .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; color: var(--text); }
+  nav .logo img { width: 28px; height: 28px; }
+  nav .links { display: flex; gap: 24px; margin-left: auto; font-size: 14px; }
+  nav .links a { color: var(--text-dim); }
+  nav .links a:hover { color: var(--text); text-decoration: none; }
+
+  .container { max-width: 760px; margin: 0 auto; padding: 60px 32px 80px; }
+
+  h1 { font-size: 40px; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .updated { color: var(--text-dim); font-size: 14px; margin: 0 0 40px; }
+  h2 { font-size: 22px; letter-spacing: -0.015em; margin: 40px 0 14px; }
+  p { margin: 0 0 14px; color: #d5d5d5; }
+  code { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: 'SF Mono', Menlo, monospace; word-break: break-all; }
+  strong { color: var(--text); }
+
+  .highlight {
+    background: rgba(22,163,74,0.1);
+    border-left: 4px solid #4ade80;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 24px 0;
+  }
+  .highlight strong { color: #4ade80; }
+
+  footer { padding: 60px 0 40px; text-align: center; color: var(--text-dim); font-size: 14px; border-top: 1px solid var(--card-border); margin-top: 60px; }
+  footer .links { margin: 12px 0; display: flex; justify-content: center; gap: 24px; }
+  footer .small { font-size: 12px; opacity: 0.7; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">
+    <img src="icon.png" alt="">
+    <span>MeltingClaude</span>
+  </a>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="SUPPORT.html">Support</a>
+    <a href="https://github.com/SSub-jun/MeltingClaude">GitHub</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: 2026-05-02</p>
+
+  <p>MeltingClaude is a macOS menu-bar app that visualizes your local Claude Code usage. This document explains exactly what the app does and does not do with your data.</p>
+
+  <div class="highlight">
+    <p><strong>TL;DR:</strong> The app makes zero network requests. Your usage data never leaves your Mac. We collect nothing.</p>
+  </div>
+
+  <h2>Data we collect</h2>
+  <p><strong>None.</strong> The app does not collect, transmit, or share any data with us or any third party.</p>
+
+  <h2>Data we read locally</h2>
+  <p>The app reads session log files that Claude Code stores at:</p>
+  <p><code>~/.claude/projects/&lt;project-hash&gt;/&lt;session-id&gt;.jsonl</code></p>
+  <p>These files are created by Claude Code (a separate product by Anthropic), not by us. On first launch the app prompts you to grant access to the <code>~/.claude/</code> folder via a standard macOS folder picker. The app uses a security-scoped bookmark so it only ever reads from the folder you selected.</p>
+  <p>We extract only the token-usage fields (<code>input_tokens</code>, <code>output_tokens</code>, <code>cache_creation_input_tokens</code>, <code>cache_read_input_tokens</code>), the timestamp, the model name, and the project working directory.</p>
+
+  <h2>Data we store locally</h2>
+  <p>The aggregated token data is saved to a local SQLite database inside the app's sandbox container on your Mac at:</p>
+  <p><code>~/Library/Containers/com.byeonjunseob.MeltingClaude/Data/Library/Application Support/MeltingClaude/usage.sqlite</code></p>
+  <p>This file never leaves your device. Uninstalling the app removes it.</p>
+
+  <h2>Network access</h2>
+  <p>The app does not make any network requests. There are no analytics, crash reporters, update checkers, or telemetry services.</p>
+
+  <h2>Children's privacy</h2>
+  <p>The app is not directed at children under 13 and collects no data from any user.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy changes, the updated version will appear at the same URL with a new "Last updated" date.</p>
+
+  <h2>Contact</h2>
+  <p>For questions or issues: <a href="https://github.com/SSub-jun/MeltingClaude/issues">github.com/SSub-jun/MeltingClaude/issues</a></p>
+
+</div>
+
+<footer>
+  <div>© 2026 MeltingClaude. Independent third-party tool — not affiliated with Anthropic.</div>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="SUPPORT.html">Support</a>
+    <a href="https://github.com/SSub-jun/MeltingClaude">GitHub</a>
+  </div>
+  <div class="small">"Claude" and "Claude Code" are products of Anthropic, PBC.</div>
+</footer>
+
+</body>
+</html>
