@@ -107,9 +107,9 @@ final class UsageViewModel: ObservableObject {
     private func frameCount(for tier: UsageTier) -> Int {
         switch tier {
         case .low:  return 2
-        case .mid:  return 3
+        case .mid:  return 4
         case .high: return 4
-        case .over: return 5
+        case .over: return 4
         }
     }
 
