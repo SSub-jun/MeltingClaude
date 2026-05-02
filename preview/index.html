@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>MeltingClaude — Preview Recorder</title>
+<style>
+  /* 캔버스 = 1280 x 800 (App Store macOS preview/screenshot 최소 해상도) */
+  html, body {
+    margin: 0; padding: 0;
+    width: 1280px; height: 800px;
+    overflow: hidden;
+    background: #0a0a0a;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    color: #fff;
+    user-select: none;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* 메인 stage */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+  }
+
+  .icon-wrap {
+    width: 420px;
+    height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #icon {
+    width: 380px;
+    height: 380px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4));
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .tier-pill {
+    padding: 12px 32px;
+    border-radius: 999px;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: background 0.4s ease, color 0.4s ease;
+    background: #16a34a;
+    color: #fff;
+  }
+
+  .tokens {
+    font-size: 18px;
+    font-weight: 500;
+    color: #aaa;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  /* 진행 바 (tier 진행도) */
+  .progress {
+    width: 360px;
+    height: 6px;
+    background: #1f1f1f;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress > .fill {
+    height: 100%;
+    width: 0%;
+    background: #16a34a;
+    border-radius: 999px;
+    transition: width 0.3s linear, background 0.4s ease;
+  }
+
+  /* 컨트롤 (녹화 시 H 로 숨김) */
+  .controls {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    background: rgba(30,30,30,0.85);
+    padding: 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }
+  .controls button {
+    padding: 10px 16px;
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+  }
+  .controls button:hover { background: #3a3a3a; }
+  .controls button.primary { background: #007aff; border-color: #007aff; }
+  .controls button.primary:hover { background: #1a8aff; }
+
+  .hint {
+    position: absolute;
+    top: 16px; left: 16px;
+    color: #555;
+    font-size: 12px;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="hint" id="hint">단축키: <b>A</b> Auto · <b>1/2/3/4</b> tier · <b>H</b> hide UI · <b>R</b> record-mode (Auto + hide)</div>
+
+<div class="stage">
+  <div class="icon-wrap">
+    <img id="icon" src="frames/low-0.png" alt="">
+  </div>
+  <div class="meta">
+    <div class="tier-pill" id="pill">OK</div>
+    <div class="tokens" id="tokens">— / —</div>
+    <div class="progress"><div class="fill" id="fill"></div></div>
+  </div>
+</div>
+
+<div class="controls" id="controls">
+  <button onclick="setTier('low')">OK</button>
+  <button onclick="setTier('mid')">Active</button>
+  <button onclick="setTier('high')">Heavy</button>
+  <button onclick="setTier('over')">At limit</button>
+  <button class="primary" onclick="autoProgress()">▶︎ Auto</button>
+  <button onclick="stopAll()">⏸ Stop</button>
+  <button onclick="recordMode()" class="primary">🎬 Record Mode</button>
+</div>
+
+<script>
+// 임계값 (Pro 플랜 기준 실제 앱 동일 값)
+const PRO = { low: 50000, mid: 150000, high: 300000 };
+
+const TIERS = {
+  low:  { frames: ['low-0.png','low-1.png'],
+          interval: 800, label: 'OK',       color: '#16a34a',
+          tokenStart: 0,              tokenEnd: PRO.low },
+  mid:  { frames: ['mid-0.png','mid-1.png','mid-2.png','mid-3.png'],
+          interval: 500, label: 'Active',   color: '#eab308',
+          tokenStart: PRO.low,        tokenEnd: PRO.mid },
+  high: { frames: ['high-0.png','high-1.png','high-2.png','high-3.png'],
+          interval: 400, label: 'Heavy',    color: '#f97316',
+          tokenStart: PRO.mid,        tokenEnd: PRO.high },
+  over: { frames: ['over-0.png','over-1.png','over-2.png','over-3.png'],
+          interval: 300, label: 'At limit', color: '#dc2626',
+          tokenStart: PRO.high,       tokenEnd: PRO.high * 1.4 }
+};
+
+const TIER_ORDER = ['low','mid','high','over'];
+const TIER_DURATION_MS = 5000;  // 자동 진행 시 각 tier 머무는 시간
+
+let currentTier = 'low';
+let frameIdx = 0;
+let frameTimer = null;
+let autoTimer = null;
+let tierStartedAt = 0;
+let progressTimer = null;
+
+function fmt(n) {
+  if (n >= 1_000_000) return (n/1_000_000).toFixed(1) + 'M';
+  if (n >= 1000) return Math.round(n/1000) + 'K';
+  return String(Math.round(n));
+}
+
+function tickFrame() {
+  const t = TIERS[currentTier];
+  document.getElementById('icon').src = 'frames/' + t.frames[frameIdx];
+  frameIdx = (frameIdx + 1) % t.frames.length;
+}
+
+function tickProgress() {
+  const t = TIERS[currentTier];
+  const elapsed = Math.min(performance.now() - tierStartedAt, TIER_DURATION_MS);
+  const ratio = elapsed / TIER_DURATION_MS;
+  const tokens = Math.round(t.tokenStart + (t.tokenEnd - t.tokenStart) * ratio);
+  document.getElementById('tokens').textContent =
+    `${fmt(tokens)} / ${fmt(PRO.high)} tokens`;
+  document.getElementById('fill').style.width = (Math.min(tokens / PRO.high, 1) * 100) + '%';
+  document.getElementById('fill').style.background = t.color;
+}
+
+function setTier(name) {
+  currentTier = name;
+  frameIdx = 0;
+  if (frameTimer) clearInterval(frameTimer);
+  if (progressTimer) clearInterval(progressTimer);
+
+  const t = TIERS[name];
+  const pill = document.getElementById('pill');
+  pill.textContent = t.label;
+  pill.style.background = t.color;
+
+  tierStartedAt = performance.now();
+  tickFrame();
+  tickProgress();
+  frameTimer    = setInterval(tickFrame, t.interval);
+  progressTimer = setInterval(tickProgress, 50);
+}
+
+function autoProgress() {
+  stopAll();
+  let i = 0;
+  setTier(TIER_ORDER[i]);
+  autoTimer = setInterval(() => {
+    i = (i + 1) % TIER_ORDER.length;
+    setTier(TIER_ORDER[i]);
+  }, TIER_DURATION_MS);
+}
+
+function stopAll() {
+  if (autoTimer) clearInterval(autoTimer);
+  autoTimer = null;
+}
+
+function recordMode() {
+  document.getElementById('controls').classList.add('hidden');
+  document.getElementById('hint').classList.add('hidden');
+  autoProgress();
+}
+
+document.addEventListener('keydown', (e) => {
+  switch (e.key.toLowerCase()) {
+    case 'a': autoProgress(); break;
+    case '1': setTier('low'); break;
+    case '2': setTier('mid'); break;
+    case '3': setTier('high'); break;
+    case '4': setTier('over'); break;
+    case 'h': {
+      const c = document.getElementById('controls');
+      const h = document.getElementById('hint');
+      c.classList.toggle('hidden');
+      h.classList.toggle('hidden');
+      break;
+    }
+    case 'r': recordMode(); break;
+    case 's': stopAll(); break;
+  }
+});
+
+setTier('low');
+</script>
+</body>
+</html>
