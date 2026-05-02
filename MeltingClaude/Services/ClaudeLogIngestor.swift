@@ -10,7 +10,7 @@ final class ClaudeLogIngestor {
     static let shared = ClaudeLogIngestor()
 
     private let store: UsageStore
-    private let projectsDir: URL
+    private let folderAccess = FolderAccessStore.shared
     private let offsetsKey = "claudeLogIngestor.fileOffsets"
     private let queue = DispatchQueue(label: "MeltingClaude.LogIngestor")
     private var timer: Timer?
@@ -19,8 +19,6 @@ final class ClaudeLogIngestor {
 
     private init(store: UsageStore = .shared) {
         self.store = store
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        self.projectsDir = home.appendingPathComponent(".claude/projects")
         let stored = UserDefaults.standard.dictionary(forKey: offsetsKey) as? [String: NSNumber] ?? [:]
         self.fileOffsets = stored.mapValues { $0.uint64Value }
         self.iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -28,18 +26,32 @@ final class ClaudeLogIngestor {
 
     // MARK: - Public
 
+    /// bookmark 가 있고, 그 폴더 안에 projects/ 가 존재하는가.
     var isClaudeCodeInstalled: Bool {
-        FileManager.default.fileExists(atPath: projectsDir.path)
+        folderAccess.withAccess { rootURL in
+            FileManager.default.fileExists(
+                atPath: rootURL.appendingPathComponent("projects").path
+            )
+        } ?? false
     }
 
     func discoverSessionFiles() -> [URL] {
-        guard isClaudeCodeInstalled else { return [] }
-        var result: [URL] = []
-        let fm = FileManager.default
-        guard let projects = try? fm.contentsOfDirectory(
-            at: projectsDir, includingPropertiesForKeys: nil
-        ) else { return [] }
+        folderAccess.withAccess { rootURL in
+            sessionFiles(under: rootURL)
+        } ?? []
+    }
 
+    /// withAccess 안에서만 호출. rootURL = 사용자가 선택한 ~/.claude/.
+    private func sessionFiles(under rootURL: URL) -> [URL] {
+        let projectsDir = rootURL.appendingPathComponent("projects")
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: projectsDir.path),
+              let projects = try? fm.contentsOfDirectory(
+                at: projectsDir, includingPropertiesForKeys: nil
+              )
+        else { return [] }
+
+        var result: [URL] = []
         for p in projects {
             var isDir: ObjCBool = false
             if fm.fileExists(atPath: p.path, isDirectory: &isDir), isDir.boolValue {
@@ -84,12 +96,15 @@ final class ClaudeLogIngestor {
 
     @discardableResult
     private func ingestNewLines() -> Int {
-        let files = discoverSessionFiles()
-        var inserted = 0
-        for f in files {
-            inserted += ingest(file: f)
-        }
-        return inserted
+        // 한 사이클 동안 security scope 한 번만 start/stop.
+        folderAccess.withAccess { rootURL in
+            let files = sessionFiles(under: rootURL)
+            var inserted = 0
+            for f in files {
+                inserted += ingest(file: f)
+            }
+            return inserted
+        } ?? 0
     }
 
     private func ingest(file: URL) -> Int {

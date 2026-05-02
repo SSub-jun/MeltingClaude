@@ -28,7 +28,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let settings = AppSettings.shared
-        if settings.hasOnboarded {
+        // Sandbox 환경에서 onboarded 였어도 bookmark 가 사라졌으면 다시 폴더 권한 받아야 함.
+        if settings.hasOnboarded && FolderAccessStore.shared.hasBookmark {
             ClaudeLogIngestor.shared.startWatching()
         } else {
             showOnboarding()

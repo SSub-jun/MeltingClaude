@@ -8,6 +8,7 @@ struct OnboardingView: View {
     @State private var sessionFileCount: Int = 0
     @State private var isWorking = false
     @State private var importedCount: Int? = nil
+    @State private var hasAccess: Bool = FolderAccessStore.shared.hasBookmark
 
     var body: some View {
         VStack(spacing: 18) {
@@ -38,8 +39,8 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.center)
         }
         .padding(28)
-        .frame(width: 480, height: 480)
-        .onAppear { refreshDetect() }
+        .frame(width: 480, height: 520)
+        .onAppear { if hasAccess { refreshDetect() } }
     }
 
     // MARK: - Plan picker
@@ -88,23 +89,37 @@ struct OnboardingView: View {
 
     // MARK: - Detection box
 
+    @ViewBuilder
     private var statusBox: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Image(systemName: ingestor.isClaudeCodeInstalled ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundStyle(ingestor.isClaudeCodeInstalled ? .green : .red)
-                Text(ingestor.isClaudeCodeInstalled
-                     ? "Claude Code detected"
-                     : "Claude Code not found at ~/.claude/projects/")
-                    .font(.callout)
-            }
-            if ingestor.isClaudeCodeInstalled {
+            if !hasAccess {
+                HStack(alignment: .top) {
+                    Image(systemName: "folder.badge.questionmark")
+                        .foregroundStyle(.orange)
+                    Text("MeltingClaude needs read access to your ~/.claude/ folder to parse Claude Code session logs. Click the button below — macOS will ask you to confirm the folder.")
+                        .font(.callout)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            } else if ingestor.isClaudeCodeInstalled {
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("Claude Code detected").font(.callout)
+                }
                 HStack {
                     Image(systemName: "doc.text")
                         .foregroundStyle(.secondary)
                     Text("\(sessionFileCount) session file\(sessionFileCount == 1 ? "" : "s") found")
                         .font(.callout)
                         .foregroundStyle(.secondary)
+                }
+            } else {
+                HStack(alignment: .top) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text("The selected folder doesn't contain a 'projects' subfolder. Make sure you pick your ~/.claude/ folder (run Claude Code at least once first).")
+                        .font(.callout)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
@@ -117,9 +132,29 @@ struct OnboardingView: View {
 
     @ViewBuilder
     private var actionButton: some View {
-        if !ingestor.isClaudeCodeInstalled {
-            HStack {
-                Button("Re-check") { refreshDetect() }
+        if !hasAccess {
+            VStack(spacing: 8) {
+                Button(action: grantAccess) {
+                    Text("Choose ~/.claude/ Folder")
+                        .frame(minWidth: 240)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                Button("Skip for now") {
+                    settings.hasOnboarded = true
+                    onFinish()
+                }
+            }
+        } else if !ingestor.isClaudeCodeInstalled {
+            VStack(spacing: 8) {
+                Button(action: grantAccess) {
+                    Text("Choose Different Folder")
+                        .frame(minWidth: 240)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
                 Button("Skip for now") {
                     settings.hasOnboarded = true
                     onFinish()
@@ -129,10 +164,10 @@ struct OnboardingView: View {
             Button(action: connect) {
                 if isWorking {
                     HStack { ProgressView().controlSize(.small); Text("Importing…") }
-                        .frame(minWidth: 220)
+                        .frame(minWidth: 240)
                 } else {
                     Text("Connect Claude Code")
-                        .frame(minWidth: 220)
+                        .frame(minWidth: 240)
                 }
             }
             .buttonStyle(.borderedProminent)
@@ -143,6 +178,13 @@ struct OnboardingView: View {
 
     private func refreshDetect() {
         sessionFileCount = ingestor.discoverSessionFiles().count
+    }
+
+    private func grantAccess() {
+        if FolderAccessStore.shared.requestAccess() != nil {
+            hasAccess = true
+            refreshDetect()
+        }
     }
 
     private func connect() {
