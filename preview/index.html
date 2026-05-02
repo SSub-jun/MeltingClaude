@@ -2,123 +2,194 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>MeltingClaude — Preview Recorder</title>
+<title>MeltingClaude — Tier Animation Showcase</title>
 <style>
   /* 캔버스 = 1280 x 800 (App Store macOS preview/screenshot 최소 해상도) */
   html, body {
     margin: 0; padding: 0;
     width: 1280px; height: 800px;
     overflow: hidden;
-    background: #0a0a0a;
+    /* macOS Sequoia 풍 그라디언트 배경 */
+    background:
+      radial-gradient(circle at 20% 0%, #2a1f4f 0%, transparent 45%),
+      radial-gradient(circle at 80% 30%, #1f2f4f 0%, transparent 50%),
+      linear-gradient(180deg, #0c0c14 0%, #0a0a0a 100%);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
     color: #fff;
     user-select: none;
-  }
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     position: relative;
   }
 
-  /* 메인 stage */
-  .stage {
+  /* macOS 시스템 메뉴바 (페이지 최상단, 전체 폭) */
+  .system-menubar {
+    height: 28px;
+    background: rgba(20,20,20,0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 18px;
+    font-size: 13px;
+    color: #f5f5f5;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .system-menubar .apple { font-size: 14px; }
+  .system-menubar .menu-item { font-weight: 400; }
+  .system-menubar .menu-item.bold { font-weight: 600; }
+  .system-menubar .spacer { flex: 1; }
+  .system-menubar .status { display: flex; align-items: center; gap: 14px; font-size: 12px; }
+
+  /* 본문 콘텐츠 */
+  .container {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 36px;
+    justify-content: center;
+    padding: 0 40px;
+    box-sizing: border-box;
   }
 
-  .icon-wrap {
-    width: 420px;
-    height: 420px;
+  .title {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .title h1 {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 0%, #b0b0c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .title p {
+    margin: 12px 0 0;
+    font-size: 18px;
+    color: #888;
+    font-weight: 400;
+  }
+
+  /* 4 tier 카드 가로 배치 */
+  .cards {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .card {
+    width: 260px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+
+  .big-icon {
+    width: 160px;
+    height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-
-  #icon {
-    width: 380px;
-    height: 380px;
+  .big-icon img {
+    width: 150px;
+    height: 150px;
     object-fit: contain;
-    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4));
+    filter: drop-shadow(0 4px 14px rgba(0,0,0,0.35));
   }
 
-  .meta {
+  /* 미니 메뉴바 mock (실제 macOS 메뉴바 모양) */
+  .mini-menubar {
+    width: 100%;
+    height: 26px;
+    background: rgba(18,18,18,0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 14px;
+    padding: 0 8px;
+    gap: 8px;
+    font-size: 10.5px;
+    color: #e5e5e5;
   }
+  .mini-menubar .apple { font-size: 11px; }
+  .mini-menubar .app { font-weight: 600; }
+  .mini-menubar .spacer { flex: 1; }
+  .mini-menubar .bar-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+  .mini-menubar .time { font-variant-numeric: tabular-nums; font-size: 10.5px; }
 
-  .tier-pill {
-    padding: 12px 32px;
+  .pill {
+    padding: 6px 16px;
     border-radius: 999px;
-    font-size: 30px;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: -0.01em;
-    transition: background 0.4s ease, color 0.4s ease;
-    background: #16a34a;
-    color: #fff;
   }
+  .pill.low  { background: #16a34a; color: #fff; }
+  .pill.mid  { background: #eab308; color: #1a1a00; }
+  .pill.high { background: #f97316; color: #fff; }
+  .pill.over { background: #dc2626; color: #fff; }
 
-  .tokens {
-    font-size: 18px;
-    font-weight: 500;
-    color: #aaa;
+  .range {
+    font-size: 12px;
+    color: #888;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
-  }
-
-  /* 진행 바 (tier 진행도) */
-  .progress {
-    width: 360px;
-    height: 6px;
-    background: #1f1f1f;
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  .progress > .fill {
-    height: 100%;
-    width: 0%;
-    background: #16a34a;
-    border-radius: 999px;
-    transition: width 0.3s linear, background 0.4s ease;
   }
 
   /* 컨트롤 (녹화 시 H 로 숨김) */
   .controls {
     position: absolute;
-    bottom: 24px;
+    bottom: 16px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
     background: rgba(30,30,30,0.85);
-    padding: 10px;
+    padding: 8px;
     border-radius: 12px;
     backdrop-filter: blur(10px);
+    z-index: 100;
   }
   .controls button {
-    padding: 10px 16px;
+    padding: 8px 14px;
     background: #2a2a2a;
     color: #fff;
     border: 1px solid #444;
     border-radius: 8px;
     cursor: pointer;
     font: inherit;
-    font-size: 14px;
+    font-size: 13px;
   }
   .controls button:hover { background: #3a3a3a; }
   .controls button.primary { background: #007aff; border-color: #007aff; }
-  .controls button.primary:hover { background: #1a8aff; }
 
   .hint {
     position: absolute;
-    top: 16px; left: 16px;
+    bottom: 16px;
+    left: 16px;
     color: #555;
-    font-size: 12px;
+    font-size: 11px;
+    z-index: 100;
   }
 
   .hidden { display: none !important; }
@@ -126,127 +197,130 @@
 </head>
 <body>
 
-<div class="hint" id="hint">단축키: <b>A</b> Auto · <b>1/2/3/4</b> tier · <b>H</b> hide UI · <b>R</b> record-mode (Auto + hide)</div>
+<!-- 시스템 메뉴바 (전체 폭) — Mac 화면 분위기 -->
+<div class="system-menubar">
+  <span class="apple"></span>
+  <span class="menu-item bold">MeltingClaude</span>
+  <span class="menu-item">File</span>
+  <span class="menu-item">Edit</span>
+  <span class="menu-item">View</span>
+  <span class="menu-item">Window</span>
+  <span class="menu-item">Help</span>
+  <span class="spacer"></span>
+  <span class="status">
+    <span>􀛨</span>
+    <span>􀙜</span>
+    <span>􀛪</span>
+    <span>9:41</span>
+  </span>
+</div>
 
-<div class="stage">
-  <div class="icon-wrap">
-    <img id="icon" src="frames/low-0.png" alt="">
+<div class="hint" id="hint">단축키: <b>H</b> hide UI · <b>R</b> record mode</div>
+
+<div class="container">
+  <div class="title">
+    <h1>Watch your Claude Code usage melt away</h1>
+    <p>4 tiers, animated in real time as you approach the 5-hour rate limit</p>
   </div>
-  <div class="meta">
-    <div class="tier-pill" id="pill">OK</div>
-    <div class="tokens" id="tokens">— / —</div>
-    <div class="progress"><div class="fill" id="fill"></div></div>
+
+  <div class="cards">
+    <!-- OK -->
+    <div class="card">
+      <div class="big-icon"><img id="big-low" src="frames/low-0.png" alt=""></div>
+      <div class="mini-menubar">
+        <span class="apple"></span>
+        <span class="app">Xcode</span>
+        <span class="spacer"></span>
+        <img class="bar-icon" id="bar-low" src="frames/low-0.png" alt="">
+        <span class="time">9:41</span>
+      </div>
+      <div class="pill low">OK</div>
+      <div class="range">0 – 50K tokens</div>
+    </div>
+
+    <!-- Active -->
+    <div class="card">
+      <div class="big-icon"><img id="big-mid" src="frames/mid-0.png" alt=""></div>
+      <div class="mini-menubar">
+        <span class="apple"></span>
+        <span class="app">Xcode</span>
+        <span class="spacer"></span>
+        <img class="bar-icon" id="bar-mid" src="frames/mid-0.png" alt="">
+        <span class="time">11:23</span>
+      </div>
+      <div class="pill mid">Active</div>
+      <div class="range">50K – 150K tokens</div>
+    </div>
+
+    <!-- Heavy -->
+    <div class="card">
+      <div class="big-icon"><img id="big-high" src="frames/high-0.png" alt=""></div>
+      <div class="mini-menubar">
+        <span class="apple"></span>
+        <span class="app">Xcode</span>
+        <span class="spacer"></span>
+        <img class="bar-icon" id="bar-high" src="frames/high-0.png" alt="">
+        <span class="time">14:08</span>
+      </div>
+      <div class="pill high">Heavy</div>
+      <div class="range">150K – 300K tokens</div>
+    </div>
+
+    <!-- At limit -->
+    <div class="card">
+      <div class="big-icon"><img id="big-over" src="frames/over-0.png" alt=""></div>
+      <div class="mini-menubar">
+        <span class="apple"></span>
+        <span class="app">Xcode</span>
+        <span class="spacer"></span>
+        <img class="bar-icon" id="bar-over" src="frames/over-0.png" alt="">
+        <span class="time">16:47</span>
+      </div>
+      <div class="pill over">At limit</div>
+      <div class="range">300K+ tokens</div>
+    </div>
   </div>
 </div>
 
 <div class="controls" id="controls">
-  <button onclick="setTier('low')">OK</button>
-  <button onclick="setTier('mid')">Active</button>
-  <button onclick="setTier('high')">Heavy</button>
-  <button onclick="setTier('over')">At limit</button>
-  <button class="primary" onclick="autoProgress()">▶︎ Auto</button>
-  <button onclick="stopAll()">⏸ Stop</button>
   <button onclick="recordMode()" class="primary">🎬 Record Mode</button>
+  <button onclick="restoreUI()">Show UI</button>
 </div>
 
 <script>
-// 임계값 (Pro 플랜 기준 실제 앱 동일 값)
-const PRO = { low: 50000, mid: 150000, high: 300000 };
+// 실제 앱 (UsageViewModel) 과 동일한 frame array + interval
+const TIERS = [
+  { key: 'low',  frames: ['low-0.png','low-1.png'],                                interval: 800 },
+  { key: 'mid',  frames: ['mid-0.png','mid-1.png','mid-2.png','mid-3.png'],        interval: 500 },
+  { key: 'high', frames: ['high-0.png','high-1.png','high-2.png','high-3.png'],    interval: 400 },
+  { key: 'over', frames: ['over-0.png','over-1.png','over-2.png','over-3.png'],    interval: 300 },
+];
 
-const TIERS = {
-  low:  { frames: ['low-0.png','low-1.png'],
-          interval: 800, label: 'OK',       color: '#16a34a',
-          tokenStart: 0,              tokenEnd: PRO.low },
-  mid:  { frames: ['mid-0.png','mid-1.png','mid-2.png','mid-3.png'],
-          interval: 500, label: 'Active',   color: '#eab308',
-          tokenStart: PRO.low,        tokenEnd: PRO.mid },
-  high: { frames: ['high-0.png','high-1.png','high-2.png','high-3.png'],
-          interval: 400, label: 'Heavy',    color: '#f97316',
-          tokenStart: PRO.mid,        tokenEnd: PRO.high },
-  over: { frames: ['over-0.png','over-1.png','over-2.png','over-3.png'],
-          interval: 300, label: 'At limit', color: '#dc2626',
-          tokenStart: PRO.high,       tokenEnd: PRO.high * 1.4 }
-};
-
-const TIER_ORDER = ['low','mid','high','over'];
-const TIER_DURATION_MS = 5000;  // 자동 진행 시 각 tier 머무는 시간
-
-let currentTier = 'low';
-let frameIdx = 0;
-let frameTimer = null;
-let autoTimer = null;
-let tierStartedAt = 0;
-let progressTimer = null;
-
-function fmt(n) {
-  if (n >= 1_000_000) return (n/1_000_000).toFixed(1) + 'M';
-  if (n >= 1000) return Math.round(n/1000) + 'K';
-  return String(Math.round(n));
-}
-
-function tickFrame() {
-  const t = TIERS[currentTier];
-  document.getElementById('icon').src = 'frames/' + t.frames[frameIdx];
-  frameIdx = (frameIdx + 1) % t.frames.length;
-}
-
-function tickProgress() {
-  const t = TIERS[currentTier];
-  const elapsed = Math.min(performance.now() - tierStartedAt, TIER_DURATION_MS);
-  const ratio = elapsed / TIER_DURATION_MS;
-  const tokens = Math.round(t.tokenStart + (t.tokenEnd - t.tokenStart) * ratio);
-  document.getElementById('tokens').textContent =
-    `${fmt(tokens)} / ${fmt(PRO.high)} tokens`;
-  document.getElementById('fill').style.width = (Math.min(tokens / PRO.high, 1) * 100) + '%';
-  document.getElementById('fill').style.background = t.color;
-}
-
-function setTier(name) {
-  currentTier = name;
-  frameIdx = 0;
-  if (frameTimer) clearInterval(frameTimer);
-  if (progressTimer) clearInterval(progressTimer);
-
-  const t = TIERS[name];
-  const pill = document.getElementById('pill');
-  pill.textContent = t.label;
-  pill.style.background = t.color;
-
-  tierStartedAt = performance.now();
-  tickFrame();
-  tickProgress();
-  frameTimer    = setInterval(tickFrame, t.interval);
-  progressTimer = setInterval(tickProgress, 50);
-}
-
-function autoProgress() {
-  stopAll();
-  let i = 0;
-  setTier(TIER_ORDER[i]);
-  autoTimer = setInterval(() => {
-    i = (i + 1) % TIER_ORDER.length;
-    setTier(TIER_ORDER[i]);
-  }, TIER_DURATION_MS);
-}
-
-function stopAll() {
-  if (autoTimer) clearInterval(autoTimer);
-  autoTimer = null;
-}
+// 각 tier 독립 루프 — 큰 icon 과 mini-menubar icon 동시 갱신
+TIERS.forEach(tier => {
+  let idx = 0;
+  const big = document.getElementById('big-' + tier.key);
+  const bar = document.getElementById('bar-' + tier.key);
+  setInterval(() => {
+    const src = 'frames/' + tier.frames[idx];
+    big.src = src;
+    bar.src = src;
+    idx = (idx + 1) % tier.frames.length;
+  }, tier.interval);
+});
 
 function recordMode() {
   document.getElementById('controls').classList.add('hidden');
   document.getElementById('hint').classList.add('hidden');
-  autoProgress();
+}
+
+function restoreUI() {
+  document.getElementById('controls').classList.remove('hidden');
+  document.getElementById('hint').classList.remove('hidden');
 }
 
 document.addEventListener('keydown', (e) => {
   switch (e.key.toLowerCase()) {
-    case 'a': autoProgress(); break;
-    case '1': setTier('low'); break;
-    case '2': setTier('mid'); break;
-    case '3': setTier('high'); break;
-    case '4': setTier('over'); break;
     case 'h': {
       const c = document.getElementById('controls');
       const h = document.getElementById('hint');
@@ -255,11 +329,8 @@ document.addEventListener('keydown', (e) => {
       break;
     }
     case 'r': recordMode(); break;
-    case 's': stopAll(); break;
   }
 });
-
-setTier('low');
 </script>
 </body>
 </html>
