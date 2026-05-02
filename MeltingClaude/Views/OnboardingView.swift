@@ -50,13 +50,12 @@ struct OnboardingView: View {
                 .font(.subheadline.bold())
 
             HStack(spacing: 8) {
-                ForEach(UserPlan.allCases) { plan in
+                ForEach(UserPlan.allCases.filter { $0 != .custom }) { plan in
                     planButton(plan)
                 }
             }
 
-            let t = settings.userPlan.thresholds
-            Text("Tier thresholds: A → \(TokenFormatter.compact(t.low)) → \(TokenFormatter.compact(t.mid)) → \(TokenFormatter.compact(t.high))+")
+            Text("Tier thresholds: A → \(TokenFormatter.compact(settings.tierLowMax)) → \(TokenFormatter.compact(settings.tierMidMax)) → \(TokenFormatter.compact(settings.tierHighMax))+")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
